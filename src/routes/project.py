@@ -5,7 +5,7 @@ from src.routes import namespace, api
 
 
 @namespace.route('/projects')
-class CreateUser(Resource):
+class CreateUser(Resource):t
   """Lets you POST to create a new project"""
 
   @namespace.doc('create_project')
