@@ -11,7 +11,7 @@ class CreateUser(Resource):
   @namespace.doc('create_project')
   def post(self):
     # repo = api.payload['repo']
-    repo = 'https://github.com/whittlbc/gabify_ex_proj.git'
+    repo = 'https://github.com/whittlbc/gabify-ex-proj.git'
 
     project = dbi.create(Project, {'repo': repo})
 
