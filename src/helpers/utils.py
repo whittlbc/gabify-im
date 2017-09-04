@@ -2,7 +2,7 @@ import requests
 import os
 
 
-# Get size of file in bytes
+# Get size of file in GB
 def get_file_size(path):
   # Remote file
   if path.startswith('http'):
@@ -26,9 +26,9 @@ def get_file_size(path):
 
     file_size = os.stat(path).st_size
 
-  return file_size
+  return file_size / 1e9
 
 
-# Gigabytes to Gibibytes conversion
+# GB to GiB conversion
 def gb2gib(gb):
   return 0.931323 * gb
