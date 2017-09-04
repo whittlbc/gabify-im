@@ -18,7 +18,7 @@ with open(GAB_FILE) as f:
   config = yaml.load(f)
 
 if type(config) != dict or not config.get('predict'):
-  raise BaseException('Invalid .gab.yml file')
+  raise BaseException('Invalid {} file'.format(GAB_FILE))
 
 split_path_info = config.get('predict').split('.')
 

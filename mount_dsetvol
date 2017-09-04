@@ -1,0 +1,5 @@
+#! /bin/bash
+
+sudo mkdir /dsetvol
+
+sudo mount /dev/xvdf /dsetvol/
