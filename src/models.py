@@ -9,7 +9,7 @@ from uuid import uuid4
 class Project(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   uid = db.Column(db.String(120), index=True, unique=True, nullable=False)
-  repo = db.Column(db.String(240), unique=True, nullable=False)
+  repo = db.Column(db.String(240))
   is_destroyed = db.Column(db.Boolean(), default=False)
   created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 

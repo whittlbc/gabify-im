@@ -10,31 +10,11 @@ class CreateUser(Resource):
 
   @namespace.doc('create_project')
   def post(self):
-    # email = api.payload['email']
-    # hashed_pw = None
-    #
-    # # Find the school they selected
-    # school = dbi.find_one(School, {'slug': api.payload['school']})
-    #
-    # user_validation_error = user_validation.validate_user(email2, school)
-    #
-    # # Return user-validation error if one exists
-    # if user_validation_error:
-    #   return dict(error=user_validation_error), 400
-    #
-    # # Password still optional at this point
-    # if 'password' in api.payload:
-    #   hashed_pw = auth_util.hash_pw(api.payload['password'])
-    #
-    # user = dbi.find_one(User, {'email': email})
-    #
-    # # If user doesn't exist yet, create him
-    # if not user:
-    #   dbi.create(User, {
-    #     'email': email,
-    #     'name': api.payload['name'],
-    #     'school': school,
-    #     'hashed_pw': hashed_pw
-    #   })
+    # repo = api.payload['repo']
+    repo = 'https://github.com/whittlbc/gabify_ex_proj.git'
 
-    return '', 201
+    project = dbi.create(Project, {'repo': repo})
+
+    # Do all the init shit
+
+    return '', 200
