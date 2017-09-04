@@ -26,7 +26,7 @@ def get_file_size(path):
 
     file_size = os.stat(path).st_size
 
-  return file_size / 1e9
+  return int(file_size) / 1e9
 
 
 # GB to GiB conversion

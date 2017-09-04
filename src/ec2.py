@@ -2,8 +2,10 @@ import boto3
 import os
 from src.helpers.definitions import UBUNTU_AMI_ID, FREE_INSTANCE_TYPE
 
-region = os.environ.get('AWS_REGION_NAME')
-ec2 = boto3.resource('ec2', region_name=region)
+region_name = os.environ.get('AWS_REGION_NAME')
+zone_name = os.environ.get('AWS_ZONE_NAME')
+
+ec2 = boto3.resource('ec2', region_name=region_name)
 
 
 def create_instance(instance_type=FREE_INSTANCE_TYPE, tagname=''):
@@ -12,8 +14,12 @@ def create_instance(instance_type=FREE_INSTANCE_TYPE, tagname=''):
     MinCount=1,
     MaxCount=1,
     InstanceType=instance_type,
+    Placement={
+      'AvailabilityZone': zone_name
+    },
     TagSpecifications=[
       {
+        'ResourceType': 'instance',
         'Tags': [
           {
             'Key': 'Name',
@@ -29,11 +35,12 @@ def create_instance(instance_type=FREE_INSTANCE_TYPE, tagname=''):
 
 def create_volume(size=1, tagname=''):
   return ec2.create_volume(
-    AvailabilityZone=region,
-    size=size,
+    AvailabilityZone=zone_name,
+    Size=size,
     VolumeType='gp2',
     TagSpecifications=[
       {
+        'ResourceType': 'volume',
         'Tags': [
           {
             'Key': 'Name',
