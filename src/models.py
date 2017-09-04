@@ -3,20 +3,20 @@ Declare your database tables as model representations
 """
 from src import db
 import datetime
+from uuid import uuid4
 
 
 class Project(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  # email = db.Column(db.String(120), index=True, unique=True)
-  # name = db.Column(db.String(120), nullable=False)
+  uid = db.Column(db.String(120), index=True, unique=True, nullable=False)
+  repo = db.Column(db.String(240), unique=True, nullable=False)
   is_destroyed = db.Column(db.Boolean(), default=False)
   created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-  def __init__(self, email, name, password):
-    self.email = email
-    self.name = name
-    self.password = password
+  def __init__(self, repo):
+    self.uid = uuid4().get_hex()
+    self.repo = repo
 
   def __repr__(self):
-    return '<User id={}, email={}, name{}, password={}, is_destroyed={}, created_at={}>'.format(
-      self.id, self.email, self.name, self.password, self.is_destroyed, self.created_at)
+    return '<User id={}, uid={}, repo={}, is_destroyed={}, created_at={}>'.format(
+      self.id, self.uid, self.repo, self.is_destroyed, self.created_at)
