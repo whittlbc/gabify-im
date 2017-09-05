@@ -59,13 +59,13 @@ def create_volume(size=1, tagname=''):
   )
 
 
-def is_instance_running(instance_id):
-  instance = ec2.Instance(instance_id)
+def is_instance_running(aws_instance_id):
+  aws_instance = ec2.Instance(aws_instance_id)
 
   try:
-    state = instance.state or {}
+    state = aws_instance.state or {}
   except BaseException, e:
-    logger.error('Error finding state of instance by id, {}, with error: {}'.format(instance_id, e))
+    logger.error('Error finding state of instance by aws id, {}, with error: {}'.format(aws_instance_id, e))
     return False
 
-  return state.get('Code') == 16
+  return aws_instance, state.get('Code') == 16
