@@ -18,7 +18,7 @@ class Project(db.Model):
     self.repo = repo
 
   def __repr__(self):
-    return '<User id={}, uid={}, repo={}, is_destroyed={}, created_at={}>'.format(
+    return '<Project id={}, uid={}, repo={}, is_destroyed={}, created_at={}>'.format(
       self.id, self.uid, self.repo, self.is_destroyed, self.created_at)
 
 
@@ -58,5 +58,5 @@ class Instance(db.Model):
     self.role = role
 
   def __repr__(self):
-    return '<Project id={}, aws_instance_id={}, project_id={}, is_destroyed={}, created_at={}>'.format(
+    return '<Instance id={}, aws_instance_id={}, project_id={}, is_destroyed={}, created_at={}>'.format(
       self.id, self.aws_instance_id, self.project_id, self.instance_type, self.is_destroyed, self.created_at)
