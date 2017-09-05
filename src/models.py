@@ -48,6 +48,7 @@ class Instance(db.Model):
   project = db.relationship('Project', backref='instances')
   instance_type = db.Column(db.String(120))
   role = db.Column(db.Integer, nullable=False)
+  ip = db.Column(db.String(120))
   is_destroyed = db.Column(db.Boolean(), default=False)
   created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
@@ -58,5 +59,5 @@ class Instance(db.Model):
     self.role = role
 
   def __repr__(self):
-    return '<Instance id={}, aws_instance_id={}, project_id={}, is_destroyed={}, created_at={}>'.format(
-      self.id, self.aws_instance_id, self.project_id, self.is_destroyed, self.created_at)
+    return '<Instance id={}, aws_instance_id={}, project_id={}, instance_type={}, role={}, ip={}, is_destroyed={}, created_at={}>'.format(
+      self.id, self.aws_instance_id, self.project_id, self.instance_type, self.role, self.ip, self.is_destroyed, self.created_at)
