@@ -28,19 +28,17 @@ class Volume(db.Model):
   project_id = db.Column(db.Integer, db.ForeignKey('project.id'), index=True, nullable=False)
   project = db.relationship('Project', backref='volume')
   size = db.Column(db.Integer)
-  volume_type = db.Column(db.String(120))
   is_destroyed = db.Column(db.Boolean(), default=False)
   created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-  def __init__(self, aws_volume_id=None, project=None, size=0, volume_type=None):
+  def __init__(self, aws_volume_id=None, project=None, size=0):
     self.aws_volume_id = aws_volume_id
     self.project = project
     self.size = size
-    self.volume_type = volume_type
 
   def __repr__(self):
-    return '<Volume id={}, aws_volume_id={}, project_id={}, size={}, volume_type={}, is_destroyed={}, created_at={}>'.format(
-      self.id, self.aws_volume_id, self.project_id, self.size, self.volume_type, self.is_destroyed, self.created_at)
+    return '<Volume id={}, aws_volume_id={}, project_id={}, size={}, is_destroyed={}, created_at={}>'.format(
+      self.id, self.aws_volume_id, self.project_id, self.size, self.is_destroyed, self.created_at)
 
 
 class Instance(db.Model):

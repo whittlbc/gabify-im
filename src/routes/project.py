@@ -40,17 +40,12 @@ class CreateUser(Resource):
 
     try:
       # Create ec2 volume to hold the dataset
-      vol_resp = create_volume(size=vol_size, tagname=project.uid)
-
-      status_code = vol_resp.get('ResponseMetadata').get('HTTPStatusCode')
-      if status_code != 200:
-        raise BaseException('Got {} status code.'.format(status_code))
+      volume = create_volume(size=vol_size, tagname=project.uid)
 
       dbi.create(Volume, {
-        'aws_volume_id': vol_resp.get('VolumeId'),
+        'aws_volume_id': volume.id,
         'project': project,
-        'size': vol_resp.get('Size'),
-        'volume_type': vol_resp.get('VolumeType')
+        'size': vol_size
       })
     except BaseException, e:
       logger.error('Error Creating Volume: {}'.format(e))
