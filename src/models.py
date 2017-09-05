@@ -26,7 +26,7 @@ class Volume(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   aws_volume_id = db.Column(db.String(120), unique=True, nullable=False)
   project_id = db.Column(db.Integer, db.ForeignKey('project.id'), index=True, nullable=False)
-  project = db.relationship('Project', backref='volume')
+  project = db.relationship('Project', backref='volumes')
   size = db.Column(db.Integer)
   is_destroyed = db.Column(db.Boolean(), default=False)
   created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
@@ -59,4 +59,4 @@ class Instance(db.Model):
 
   def __repr__(self):
     return '<Instance id={}, aws_instance_id={}, project_id={}, is_destroyed={}, created_at={}>'.format(
-      self.id, self.aws_instance_id, self.project_id, self.instance_type, self.is_destroyed, self.created_at)
+      self.id, self.aws_instance_id, self.project_id, self.is_destroyed, self.created_at)
