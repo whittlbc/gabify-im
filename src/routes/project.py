@@ -5,7 +5,7 @@ from flask_restplus import Resource
 from src import dbi, logger
 from src.models import Project, Volume, Instance
 from src.routes import namespace, api
-from src.helpers.definitions import tmp_dir, GAB_FILE, FREE_INSTANCE_TYPE
+from src.helpers.definitions import tmp_dir, GAB_FILE, FREE_INSTANCE_TYPE, API_AMI_ID
 from src.helpers.utils import get_file_size, gb2gib
 from src.ec2 import create_instance, create_volume
 from src.helpers import roles
@@ -53,7 +53,7 @@ class CreateUser(Resource):
 
     try:
       # Create ec2 instance for the API
-      api_instance = create_instance(tagname='API-{}'.format(project.uid))
+      api_instance = create_instance(image_id=API_AMI_ID, tagname='API-{}'.format(project.uid))
 
       dbi.create(Instance, {
         'aws_instance_id': api_instance.id,
@@ -65,6 +65,20 @@ class CreateUser(Resource):
       logger.error('Error creating API instance: {}'.format(e))
       return 'Error Creating Instance', 500
 
-    # Start a watcher for the instance to check when it's available
+    # Start a watcher for the instance to check when it's available...
+
+    # Once it's available:
+    #
+    # (1) store IP address in api_instance.ip
+    # (2) attach volume to api_instance
+    # (3) ssh into api_instance
+    # - these bash scripts should just be an image snapshot <-- WRONG, WRITE ONE BASH SCRIPT THAT GIT CLONES A REPO CONTAINING THESE BASH SCRIPTS INSTEAD. YOU DON'T WANT YOUR IMAGE HAVING TO BE UPDATED
+    # (4) init_new_vol
+    # (5) mount_dsetvol
+    # (6) download dataset onto new volume
+    # (7) unmount dsetvol
+    # (8) detach volume from api_instance
+
+
 
     return '', 200

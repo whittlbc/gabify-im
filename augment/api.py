@@ -8,8 +8,8 @@ import json
 from inspect import getargspec
 from flask import Flask, request, make_response
 
-GAB_FILE = '<GAB_FILE>'
-APP_NAME = '<APP_NAME>'
+GAB_FILE = '.gab.yml'
+PROJECT_NAME = os.environ.get('PROJECT_NAME')
 
 if not os.path.exists(GAB_FILE):
   raise BaseException('No .gab.yml file found.')
@@ -44,7 +44,7 @@ predict_args = getargspec(predict).args
 app = Flask(__name__)
 
 
-@app.route('/{}/predict'.format(APP_NAME))
+@app.route('/{}/predict'.format(PROJECT_NAME))
 def get_prediction():
   request_args = dict(request.args.items())
 
