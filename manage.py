@@ -24,7 +24,7 @@ migrate = Migrate(app, db)
 manager = Manager(app)
 
 # Import all models here to make our schema changes available to Migrate
-from src.models import Project
+from src.models import Project, Volume, Instance
 
 manager.add_command('db', MigrateCommand)
 

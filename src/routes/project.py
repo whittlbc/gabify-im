@@ -3,13 +3,12 @@ import math
 import yaml
 from flask_restplus import Resource
 from src import dbi, logger
-from src.models import Project
+from src.models import Project, Volume, Instance
 from src.routes import namespace, api
-from src.helpers.definitions import tmp_dir, GAB_FILE
+from src.helpers.definitions import tmp_dir, GAB_FILE, FREE_INSTANCE_TYPE
 from src.helpers.utils import get_file_size, gb2gib
 from src.ec2 import create_instance, create_volume
-
-import code
+from src.helpers import roles
 
 
 @namespace.route('/projects')
@@ -25,7 +24,7 @@ class CreateUser(Resource):
     # Create a new Project model for them
     project = dbi.create(Project, {'repo': repo})
 
-    tmp_repo_dir = tmp_dir + '/repo'
+    tmp_repo_dir = '{}/{}'.format(tmp_dir, project.uid)
 
     # git clone the repo locally to access some of its files
     os.system('git clone {} {}'.format(repo, tmp_repo_dir))
@@ -34,7 +33,7 @@ class CreateUser(Resource):
     with open('{}/{}'.format(tmp_repo_dir, GAB_FILE)) as f:
       config = yaml.load(f)
 
-    # Figure out which size of volume you'll need to create to hold the dataset
+    # Figure out which size of volume you will need to hold the dataset
     dataset_loc = config['dataset']['location']
     dataset_size = gb2gib(get_file_size(dataset_loc))  # in GiB
     vol_size = int(math.ceil(dataset_size)) + 1  # adding extra GiB in volume
@@ -47,10 +46,12 @@ class CreateUser(Resource):
       if status_code != 200:
         raise BaseException('Got {} status code.'.format(status_code))
 
-      vol_id = vol_resp.get('VolumeId')
-
-      # Store vol_id somewhere
-
+      dbi.create(Volume, {
+        'aws_volume_id': vol_resp.get('VolumeId'),
+        'project': project,
+        'size': vol_resp.get('Size'),
+        'volume_type': vol_resp.get('VolumeType')
+      })
     except BaseException, e:
       logger.error('Error Creating Volume: {}'.format(e))
       return 'Error Creating Volume', 500
@@ -59,7 +60,12 @@ class CreateUser(Resource):
       # Create ec2 instance for the API
       api_instance = create_instance(tagname='API-{}'.format(project.uid))
 
-      # Store api_instance.id somewhere
+      dbi.create(Instance, {
+        'aws_instance_id': api_instance.id,
+        'project': project,
+        'instance_type': FREE_INSTANCE_TYPE,
+        'role': roles.API
+      })
     except BaseException, e:
       logger.error('Error creating API instance: {}'.format(e))
       return 'Error Creating Instance', 500

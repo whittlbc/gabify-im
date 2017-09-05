@@ -1,0 +1,2 @@
+API = 0
+TRAINER = 1
