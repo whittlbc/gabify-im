@@ -60,14 +60,12 @@ def create_volume(size=1, tagname=''):
 
 
 def is_instance_running(instance_id):
+  instance = ec2.Instance(instance_id)
+
   try:
-    instances = ec2.instances.filter(InstanceIds=[instance_id])
-    instances = list(instances)
+    state = instance.state or {}
   except BaseException, e:
-    logger.error('Error finding instance by id, {}, with error: {}'.format(instance_id, e))
+    logger.error('Error finding state of instance by id, {}, with error: {}'.format(instance_id, e))
     return False
 
-  if not instances:
-    return False
-
-  return instances[0].state.get('Code') == 16
+  return state.get('Code') == 16

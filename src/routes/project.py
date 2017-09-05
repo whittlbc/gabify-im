@@ -45,7 +45,7 @@ class CreateUser(Resource):
       dbi.create(Volume, {
         'aws_volume_id': volume.id,
         'project': project,
-        'size': vol_size
+        'size': volume.size
       })
     except BaseException, e:
       logger.error('Error Creating Volume: {}'.format(e))
