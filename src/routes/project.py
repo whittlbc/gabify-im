@@ -9,6 +9,7 @@ from src.helpers.definitions import tmp_dir, GAB_FILE, FREE_INSTANCE_TYPE, API_A
 from src.helpers.utils import get_file_size, gb2gib
 from src.ec2 import create_instance, create_volume
 from src.helpers import roles
+from src.jobs.watch_instance_until_running import WatchInstanceUntilRunning
 
 
 @namespace.route('/projects')
@@ -23,6 +24,8 @@ class CreateUser(Resource):
 
     # Create a new Project model for them
     project = dbi.create(Project, {'repo': repo})
+
+    # Create a delayed job to handle all of the below, and if anything ever goes wrong, destroy the project
 
     tmp_repo_dir = '{}/{}'.format(tmp_dir, project.uid)
 
@@ -65,20 +68,19 @@ class CreateUser(Resource):
       logger.error('Error creating API instance: {}'.format(e))
       return 'Error Creating Instance', 500
 
-    # Start a watcher for the instance to check when it's available...
+    # This on_done functionality is built-in and assumes the thing is a delayed job
+    # If you don't want that (since it's inside one anyways), just update the ip address afterwards and continue on
+    watcher = WatchInstanceUntilRunning(api_instance, on_done=None)
+    watcher.perform()
+    # TODO: Create an on_done for ^this, with the following taking place:
 
-    # Once it's available:
-    #
-    # (1) store IP address in api_instance.ip
-    # (2) attach volume to api_instance
-    # (3) ssh into api_instance
+    # (1) attach volume to api_instance
+    # (2) ssh into api_instance
     # - these bash scripts should just be an image snapshot <-- WRONG, WRITE ONE BASH SCRIPT THAT GIT CLONES A REPO CONTAINING THESE BASH SCRIPTS INSTEAD. YOU DON'T WANT YOUR IMAGE HAVING TO BE UPDATED
-    # (4) init_new_vol
-    # (5) mount_dsetvol
-    # (6) download dataset onto new volume
-    # (7) unmount dsetvol
-    # (8) detach volume from api_instance
-
-
+    # (3) init_new_vol
+    # (4) mount_dsetvol
+    # (5) download dataset onto new volume
+    # (6) unmount dsetvol
+    # (7) detach volume from api_instance
 
     return '', 200
