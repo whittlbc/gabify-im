@@ -10,6 +10,7 @@ from src.helpers.utils import get_file_size, gb2gib
 from src.ec2 import create_instance, create_volume
 from src.helpers import roles
 from src.services import watch_instance_until_running
+from src.ssh import remote_exec
 
 
 @namespace.route('/projects')
@@ -72,7 +73,7 @@ class CreateUser(Resource):
     aws_instance = watch_instance_until_running.perform(instance)
 
     # Update instance's IP
-    dbi.update(instance, {'ip': aws_instance.public_ip_address})
+    instance = dbi.update(instance, {'ip': aws_instance.public_ip_address})
 
     try:
       aws_instance.attach_volume(
@@ -85,15 +86,16 @@ class CreateUser(Resource):
 
       return 'Error Attaching Volume', 500
 
-    # SSH onto instance you're gonna create image with and create init_attached_vol somewhere and test it
+    remote_exec(instance.ip, 'init_attached_vol', sudo=True)
+    remote_exec(instance.ip, 'init_vol', sudo=True)
+    remote_exec(instance.ip, 'mount_dsetvol', sudo=True)
+    remote_exec(instance.ip, 'cd /dsetvol && wget {}'.format(dataset_loc))
+    remote_exec(instance.ip, 'unmount_dsetvol', sudo=True)
 
-    # Create new image
-    # (1) ssh into api_instance and run:
-    #   - sudo init_attached_vol
-    #   - sudo init_vol
-    #   - sudo mount_dsetvol
-    # (2) download dataset onto new volume
-    # (3) unmount dsetvol
-    # (4) detach volume from api_instance?
+    aws_instance.detach_volume(
+      Device='/dev/sdh',
+      VolumeId=volume.aws_volume_id,
+      Force=False
+    )
 
     return '', 200

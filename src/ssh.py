@@ -5,7 +5,10 @@ ssh = SSHClient()
 ssh.set_missing_host_key_policy(AutoAddPolicy())
 
 
-def remote_exec(ip, cmd):
+def remote_exec(ip, cmd, sudo=False):
+  if sudo:
+    cmd = 'sudo ' + cmd
+
   try:
     ssh.connect(ip, username=UBUNTU_USERNAME, key_filename=pem_key)
   except BaseException:
