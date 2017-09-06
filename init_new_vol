@@ -1,3 +1,0 @@
-#! /bin/bash
-
-sudo mkfs -t ext4 /dev/xvdf
