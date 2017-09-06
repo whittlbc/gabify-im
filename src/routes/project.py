@@ -87,6 +87,7 @@ class CreateUser(Resource):
 
     # SSH onto instance you're gonna create image with and create init_attached_vol somewhere and test it
 
+    # Create new image
     # (1) ssh into api_instance and run:
     #   - sudo init_attached_vol
     #   - sudo init_vol
