@@ -86,10 +86,12 @@ class CreateUser(Resource):
 
       return 'Error Attaching Volume', 500
 
+    dataset_ext = 'hdf5'  # actually determine this
+
     remote_exec(instance.ip, 'init_attached_vol', sudo=True)
     remote_exec(instance.ip, 'init_vol', sudo=True)
     remote_exec(instance.ip, 'mount_dsetvol', sudo=True)
-    remote_exec(instance.ip, 'cd /dsetvol && wget {}'.format(dataset_loc))
+    remote_exec(instance.ip, 'wget -O /dsetvol/dataset.{} {}'.format(dataset_ext, dataset_loc))
     remote_exec(instance.ip, 'unmount_dsetvol', sudo=True)
 
     aws_instance.detach_volume(
