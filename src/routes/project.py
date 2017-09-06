@@ -9,7 +9,7 @@ from src.helpers.definitions import tmp_dir, GAB_FILE, FREE_INSTANCE_TYPE, API_A
 from src.helpers.utils import get_file_size, gb2gib
 from src.ec2 import create_instance, create_volume
 from src.helpers import roles
-from src.jobs.watch_instance_until_running import WatchInstanceUntilRunning
+from src.services import watch_instance_until_running
 
 
 @namespace.route('/projects')
@@ -43,12 +43,12 @@ class CreateUser(Resource):
 
     try:
       # Create ec2 volume to hold the dataset
-      volume = create_volume(size=vol_size, tagname=project.uid)
+      aws_volume = create_volume(size=vol_size, tagname=project.uid)
 
-      dbi.create(Volume, {
-        'aws_volume_id': volume.id,
+      volume = dbi.create(Volume, {
+        'aws_volume_id': aws_volume.id,
         'project': project,
-        'size': volume.size
+        'size': aws_volume.size
       })
     except BaseException, e:
       logger.error('Error Creating Volume: {}'.format(e))
@@ -56,10 +56,10 @@ class CreateUser(Resource):
 
     try:
       # Create ec2 instance for the API
-      api_instance = create_instance(image_id=API_AMI_ID, tagname='API-{}'.format(project.uid))
+      aws_instance = create_instance(image_id=API_AMI_ID, tagname='API-{}'.format(project.uid))
 
-      dbi.create(Instance, {
-        'aws_instance_id': api_instance.id,
+      instance = dbi.create(Instance, {
+        'aws_instance_id': aws_instance.id,
         'project': project,
         'instance_type': FREE_INSTANCE_TYPE,
         'role': roles.API
@@ -68,13 +68,23 @@ class CreateUser(Resource):
       logger.error('Error creating API instance: {}'.format(e))
       return 'Error Creating Instance', 500
 
-    # This on_done functionality is built-in and assumes the thing is a delayed job
-    # If you don't want that (since it's inside one anyways), just update the ip address afterwards and continue on
-    watcher = WatchInstanceUntilRunning(api_instance, on_done=None)
-    watcher.perform()
-    # TODO: Create an on_done for ^this, with the following taking place:
+    # Wait until instance is running
+    aws_instance = watch_instance_until_running.perform(instance)
 
-    # (1) attach volume to api_instance
+    # Update instance's IP
+    dbi.update(instance, {'ip': aws_instance.public_ip_address})
+
+    try:
+      aws_instance.attach_volume(
+        Device='/dev/sdh',
+        VolumeId=volume.aws_volume_id
+      )
+    except BaseException, e:
+      logger.error('Error attaching volume({}) to instance({}): {}'.format(
+        volume.aws_volume_id, aws_instance.id, e))
+
+      return 'Error Attaching Volume', 500
+
     # (2) ssh into api_instance
     # - these bash scripts should just be an image snapshot <-- WRONG, WRITE ONE BASH SCRIPT THAT GIT CLONES A REPO CONTAINING THESE BASH SCRIPTS INSTEAD. YOU DON'T WANT YOUR IMAGE HAVING TO BE UPDATED
     # (3) init_new_vol

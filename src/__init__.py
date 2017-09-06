@@ -8,6 +8,7 @@ from src.helpers.env import is_prod
 app = Flask(__name__)
 app.config.from_object(get_config())
 
+logging.basicConfig()
 app.logger.addHandler(logging.FileHandler('main.log'))
 app.logger.setLevel(logging.INFO)
 logger = app.logger
@@ -20,3 +21,6 @@ api.init_app(app)
 if is_prod() and os.environ.get('REQUIRE_SSL') == 'true':
   from flask_sslify import SSLify
   SSLify(app)
+
+from src.scheduler import scheduler
+scheduler.start()
