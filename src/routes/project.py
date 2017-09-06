@@ -87,12 +87,12 @@ class CreateUser(Resource):
 
     # SSH onto instance you're gonna create image with and create init_attached_vol somewhere and test it
 
-    # (2) ssh into api_instance
-    # - these bash scripts should just be an image snapshot <-- WRONG, WRITE ONE BASH SCRIPT THAT GIT CLONES A REPO CONTAINING THESE BASH SCRIPTS INSTEAD. YOU DON'T WANT YOUR IMAGE HAVING TO BE UPDATED
-    # (3) init_new_vol
-    # (4) mount_dsetvol
-    # (5) download dataset onto new volume
-    # (6) unmount dsetvol
-    # (7) detach volume from api_instance
+    # (1) ssh into api_instance and run:
+    #   - sudo init_attached_vol
+    #   - sudo init_vol
+    #   - sudo mount_dsetvol
+    # (2) download dataset onto new volume
+    # (3) unmount dsetvol
+    # (4) detach volume from api_instance?
 
     return '', 200
