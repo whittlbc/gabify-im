@@ -6,7 +6,7 @@ from src import dbi, logger
 from src.models import Project, Volume, Instance
 from src.routes import namespace, api
 from src.helpers.definitions import tmp_dir, GAB_FILE, FREE_INSTANCE_TYPE, API_AMI_ID
-from src.helpers.utils import get_file_size, gb2gib
+from src.helpers.utils import get_file_size, gb2gib, get_file_ext
 from src.ec2 import create_instance, create_volume
 from src.helpers import roles
 from src.services import watch_instance_until_running
@@ -37,10 +37,15 @@ class CreateUser(Resource):
     with open('{}/{}'.format(tmp_repo_dir, GAB_FILE)) as f:
       config = yaml.load(f)
 
+    # TODO: Don't forget to store this yaml information somewhere!
+
     # Figure out which size of volume you will need to hold the dataset
     dataset_loc = config['dataset']['location']
     dataset_size = gb2gib(get_file_size(dataset_loc))  # in GiB
     vol_size = int(math.ceil(dataset_size)) + 1  # adding extra GiB in volume
+
+    # Get the file extension for the dataset
+    dataset_ext = get_file_ext(dataset_loc)
 
     try:
       # Create ec2 volume to hold the dataset
@@ -85,8 +90,6 @@ class CreateUser(Resource):
         volume.aws_volume_id, aws_instance.id, e))
 
       return 'Error Attaching Volume', 500
-
-    dataset_ext = 'hdf5'  # actually determine this
 
     remote_exec(instance.ip, 'init_attached_vol', sudo=True)
     remote_exec(instance.ip, 'init_vol', sudo=True)

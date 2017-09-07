@@ -1,5 +1,6 @@
 import requests
 import os
+from urlparse import urlparse
 
 
 # Get size of file in GB
@@ -32,3 +33,16 @@ def get_file_size(path):
 # GB to GiB conversion
 def gb2gib(gb):
   return 0.931323 * gb
+
+
+def get_file_ext(path):
+  if not path.startswith('http'):
+    return path.split('.')[-1]
+
+  parsed = urlparse(path)
+  root, ext = os.path.splitext(parsed.path)
+
+  if not ext:
+    return None
+
+  return ext[1:]
