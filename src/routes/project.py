@@ -33,11 +33,11 @@ class CreateUser(Resource):
     # git clone the repo locally to access some of its files
     os.system('git clone {} {}'.format(repo, tmp_repo_dir))
 
+    # TODO: Make a config reader and raise an error if it's not a valid .gab.yml file
+
     # Get it's .gab.yml file
     with open('{}/{}'.format(tmp_repo_dir, GAB_FILE)) as f:
       config = yaml.load(f)
-
-    # TODO: Don't forget to store this yaml information somewhere!
 
     # Figure out which size of volume you will need to hold the dataset
     dataset_loc = config['dataset']['location']
