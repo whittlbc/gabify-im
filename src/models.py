@@ -65,22 +65,6 @@ class Instance(db.Model):
     return '<Instance id={}, aws_instance_id={}, project_id={}, instance_type={}, role={}, ip={}, is_destroyed={}, created_at={}>'.format(
       self.id, self.aws_instance_id, self.project_id, self.instance_type, self.role, self.ip, self.is_destroyed, self.created_at)
 
-"""
-dataset:
-  location: https://s3-us-west-1.amazonaws.com/jarvisdev/glimpse/dataset-100.hdf5
-  update_with: src.dataset.update
-  retrain_after: 100
-
-model: data/model.ckpt
-
-train:
-- python train.py
-
-test:
-- python test.py
-
-predict: src.model.predict
-"""
 
 class Config(db.Model):
   id = db.Column(db.Integer, primary_key=True)
