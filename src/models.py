@@ -70,13 +70,13 @@ class Config(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   project_id = db.Column(db.Integer, db.ForeignKey('project.id'), index=True, nullable=False)
   project = db.relationship('Project', back_populates='config')
-  dataset_loc = db.Column(db.String(240))
+  dataset_loc = db.Column(db.String(240), nullable=False)
   update_with = db.Column(db.String(120))
   retrain_after = db.Column(db.Integer)
-  model_path = db.Column(db.String(240))
+  model_path = db.Column(db.String(240), nullable=False)
   train = db.Column(JSON, default=[])
   test = db.Column(JSON, default=[])
-  predict = db.Column(db.String(120))
+  predict = db.Column(db.String(120), nullable=False)
 
   def __init__(self, project, config={}):
     self.project = project
