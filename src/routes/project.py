@@ -3,7 +3,7 @@ import math
 import yaml
 from flask_restplus import Resource
 from src import dbi, logger
-from src.models import Project, Volume, Instance
+from src.models import Project, Volume, Instance, Config
 from src.routes import namespace, api
 from src.helpers.definitions import tmp_dir, GAB_FILE, FREE_INSTANCE_TYPE, API_AMI_ID
 from src.helpers.utils import get_file_size, gb2gib, get_file_ext
@@ -33,19 +33,22 @@ class CreateUser(Resource):
     # git clone the repo locally to access some of its files
     os.system('git clone {} {}'.format(repo, tmp_repo_dir))
 
-    # TODO: Make a config reader and raise an error if it's not a valid .gab.yml file
-
     # Get it's .gab.yml file
     with open('{}/{}'.format(tmp_repo_dir, GAB_FILE)) as f:
-      config = yaml.load(f)
+      config_yaml = yaml.load(f)
+
+    try:
+      config = dbi.create(Config, {'project': project, 'config': config_yaml})
+    except AssertionError:
+      logger.error('Invalid config file')
+      return 'Invalid config file', 500
 
     # Figure out which size of volume you will need to hold the dataset
-    dataset_loc = config['dataset']['location']
-    dataset_size = gb2gib(get_file_size(dataset_loc))  # in GiB
+    dataset_size = gb2gib(get_file_size(config.dataset_loc))  # in GiB
     vol_size = int(math.ceil(dataset_size)) + 1  # adding extra GiB in volume
 
     # Get the file extension for the dataset
-    dataset_ext = get_file_ext(dataset_loc)
+    dataset_ext = get_file_ext(config.dataset_loc)
 
     try:
       # Create ec2 volume to hold the dataset
@@ -94,7 +97,7 @@ class CreateUser(Resource):
     remote_exec(instance.ip, 'init_attached_vol', sudo=True)
     remote_exec(instance.ip, 'init_vol', sudo=True)
     remote_exec(instance.ip, 'mount_dsetvol', sudo=True)
-    remote_exec(instance.ip, 'wget -O /dsetvol/dataset.{} {}'.format(dataset_ext, dataset_loc))
+    remote_exec(instance.ip, 'wget -O /dsetvol/dataset.{} {}'.format(dataset_ext, config.dataset_loc))
     remote_exec(instance.ip, 'unmount_dsetvol', sudo=True)
 
     aws_instance.detach_volume(
