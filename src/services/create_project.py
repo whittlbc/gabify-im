@@ -59,11 +59,11 @@ def perform(repo):
   # Initialize the newly attached volume on the instance
   init_attached_volume.perform(instance, config)
 
-  logger.info('Detaching volume from API instance...')
+  logger.info('Dettaching volume from API instance...')
 
   # Detach the volume
-  aws_instance.detach_volume(
-    Device=VOLUME_DEVICE,
-    VolumeId=volume.aws_volume_id,
-    Force=False
-  )
+  # aws_instance.detach_volume(
+  #   Device=VOLUME_DEVICE,
+  #   VolumeId=volume.aws_volume_id,
+  #   Force=False
+  # )
