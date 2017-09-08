@@ -9,5 +9,5 @@ def perform(instance, config=None):
   remote_exec(instance.ip, 'init_attached_vol', sudo=True)
   remote_exec(instance.ip, 'init_vol', sudo=True)
   remote_exec(instance.ip, 'mount_dsetvol', sudo=True)
-  remote_exec(instance.ip, 'wget -O /dsetvol/dataset.{} {}'.format(get_file_ext(dataset_loc), dataset_loc))
+  remote_exec(instance.ip, 'wget -O /dsetvol/dataset.{} {}'.format(get_file_ext(dataset_loc), dataset_loc), sudo=True)
   remote_exec(instance.ip, 'unmount_dsetvol', sudo=True)

@@ -3,7 +3,7 @@ Create a new Gabify project and everything that goes along with the initial setu
 """
 import os
 import math
-from src import dbi
+from src import dbi, logger
 from src.models import Project
 from src.helpers.definitions import tmp_dir, GAB_FILE, API_AMI_ID, VOLUME_DEVICE
 from src.services import config_from_file, create_volume, create_instance, watch_instance_until_running, init_attached_volume
@@ -13,8 +13,12 @@ from src.helpers import roles
 
 # TODO: Run this whole thing as a transaction
 def perform(repo):
+  logger.info('Creating project: {}...'.format(repo))
+
   # Create new Project for repo
   project = dbi.create(Project, {'repo': repo})
+
+  logger.info('Cloning repo...')
 
   # Clone the repo locally to access its files
   tmp_repo_dir = '{}/{}'.format(tmp_dir, project.uid)
@@ -23,6 +27,8 @@ def perform(repo):
   # Get a Config model instance from the project's .gab.yml file
   config_path = '{}/{}'.format(tmp_repo_dir, GAB_FILE)
   config = config_from_file.perform(config_path, project)
+
+  logger.info('Determining volume size...')
 
   # Figure out which size volume you will need to hold the dataset
   dataset_size = gb2gib(get_file_size(config.dataset_loc))  # in GiB
@@ -37,8 +43,12 @@ def perform(repo):
   # Wait until instance is running
   aws_instance = watch_instance_until_running.perform(instance)
 
+  logger.info('Setting instance\'s IP...')
+
   # Update instance's IP
   instance = dbi.update(instance, {'ip': aws_instance.public_ip_address})
+
+  logger.info('Attaching volume to API instance...')
 
   # Attach Volume to API Instance
   aws_instance.attach_volume(
@@ -48,6 +58,8 @@ def perform(repo):
 
   # Initialize the newly attached volume on the instance
   init_attached_volume.perform(instance, config)
+
+  logger.info('Detaching volume from API instance...')
 
   # Detach the volume
   aws_instance.detach_volume(

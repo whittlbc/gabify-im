@@ -1,5 +1,5 @@
 from flask_restplus import Resource, fields
-from src import scheduler
+from src import delayed
 from src.routes import namespace, api
 from src.services import create_project
 
@@ -19,6 +19,6 @@ class CreateUser(Resource):
     repo = api.payload['repo']
 
     # Schedule a create_new_project service
-    scheduler.add_job(create_project.perform, args=[repo])
+    delayed.add_job(create_project.perform, args=[repo])
 
     return '', 200

@@ -20,5 +20,5 @@ job_defaults = {
   'max_instances': 3
 }
 
-scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors,
+delayed = BackgroundScheduler(jobstores=jobstores, executors=executors,
                                 job_defaults=job_defaults, timezone=utc)

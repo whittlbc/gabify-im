@@ -13,6 +13,9 @@ app.logger.addHandler(logging.FileHandler('main.log'))
 app.logger.setLevel(logging.INFO)
 logger = app.logger
 
+from src.scheduler import delayed
+delayed.start()
+
 db = SQLAlchemy(app)
 
 from src.routes import api
@@ -21,6 +24,3 @@ api.init_app(app)
 if is_prod() and os.environ.get('REQUIRE_SSL') == 'true':
   from flask_sslify import SSLify
   SSLify(app)
-
-from src.scheduler import scheduler
-scheduler.start()
