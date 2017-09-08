@@ -1,3 +1,6 @@
+"""
+Create DB Config record from .gab.yml file
+"""
 import yaml
 from src.models import Config
 from src.dbi import create

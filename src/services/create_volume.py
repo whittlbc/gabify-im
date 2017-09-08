@@ -1,3 +1,6 @@
+"""
+Create EBS volume and DB representation of that volume
+"""
 from src import ec2, logger
 from src.dbi import create
 from src.models import Volume

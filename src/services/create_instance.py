@@ -1,3 +1,6 @@
+"""
+Create EC2 instance and DB representation of that instance
+"""
 from src.dbi import create
 from src.models import Instance
 from src import ec2, logger

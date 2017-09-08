@@ -4,6 +4,7 @@ from src.routes import namespace, api
 from src.services import create_project, train_model
 from src.models import Project
 
+# Formats to compare request param structures against
 create_project_model = api.model('Project', {
   'repo': fields.String(required=True)
 })
@@ -15,6 +16,8 @@ train_project_model = api.model('Project', {
 
 @namespace.route('/projects')
 class CreateProject(Resource):
+  """Create new project"""
+
   @namespace.doc('create_project')
   @namespace.expect(create_project_model, validate=True)
   def post(self):
@@ -29,6 +32,8 @@ class CreateProject(Resource):
 
 @namespace.route('/train')
 class TrainProject(Resource):
+  """Start training model for project"""
+
   @namespace.doc('train_project')
   @namespace.expect(train_project_model, validate=True)
   def post(self):

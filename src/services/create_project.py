@@ -62,8 +62,8 @@ def perform(repo):
   logger.info('Dettaching volume from API instance...')
 
   # Detach the volume
-  # aws_instance.detach_volume(
-  #   Device=VOLUME_DEVICE,
-  #   VolumeId=volume.aws_volume_id,
-  #   Force=False
-  # )
+  aws_instance.detach_volume(
+    Device=VOLUME_DEVICE,
+    VolumeId=volume.aws_volume_id,
+    Force=False
+  )

@@ -1,3 +1,6 @@
+"""
+Train a model and transfer that model to the project's API instance afterwards
+"""
 from src.services import create_instance, watch_instance_until_running, transfer_model
 from src import dbi, logger
 from src.helpers import roles

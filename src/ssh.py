@@ -1,3 +1,6 @@
+"""
+Execute a command on a remote machine (with valid ssh access)
+"""
 from paramiko import SSHClient, AutoAddPolicy
 from src.helpers.definitions import UBUNTU_USERNAME, pem_key
 from src import logger

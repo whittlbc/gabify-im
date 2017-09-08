@@ -1,3 +1,6 @@
+"""
+Transfer model between Trainer/API instances for a project
+"""
 import os
 from src import logger
 from src.helpers.definitions import UBUNTU_USERNAME

@@ -1,3 +1,6 @@
+"""
+Poll the AWS API until a certain instance is 'running'
+"""
 from src.ec2 import is_instance_running
 from time import sleep
 from src import logger

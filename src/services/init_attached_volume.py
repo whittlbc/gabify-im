@@ -1,3 +1,6 @@
+"""
+Commands to run the first time a volume is attached to an instance
+"""
 from src.helpers.utils import get_file_ext
 from src.ssh import remote_exec
 
