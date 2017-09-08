@@ -69,3 +69,7 @@ def is_instance_running(aws_instance_id):
     return False
 
   return aws_instance, state.get('Code') == 16
+
+
+def instance_tagname(project):
+  return 'API-{}'.format(project.uid)
