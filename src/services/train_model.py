@@ -37,12 +37,13 @@ def perform(project):
     VolumeId=project.volume.aws_volume_id
   )
 
-  # TODO: Only run this if init_vol doesn't exist yet
-  remote_exec(instance.ip, 'init_attached_vol', sudo=True)
+  out, err = remote_exec(instance.ip, 'ls -l /usr/local/bin | grep init_vol')
 
+  # if init_vol script doesn't exist yet, run init_attached_vol
+  if not out:
+    remote_exec(instance.ip, 'init_attached_vol', sudo=True)
   # TODO: Might run into error with this one if it's already been run...might need to check if /dsetvol exists
   remote_exec(instance.ip, 'init_vol', sudo=True)
-
   remote_exec(instance.ip, 'mount_dsetvol', sudo=True)
 
   # Run train command(s) on trainer instance

@@ -26,4 +26,4 @@ def remote_exec(ip, cmd, sudo=False, log=True):
   except BaseException:
     raise BaseException('Error running {} on {}'.format(cmd, ip))
 
-  return stdout.read()
+  return stdout.read(), stderr.read()
