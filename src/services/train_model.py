@@ -42,12 +42,13 @@ def perform(project):
   # if init_vol script doesn't exist yet, run init_attached_vol
   if not out:
     remote_exec(instance.ip, 'init_attached_vol', sudo=True)
+
   # TODO: Might run into error with this one if it's already been run...might need to check if /dsetvol exists
   remote_exec(instance.ip, 'init_vol', sudo=True)
   remote_exec(instance.ip, 'mount_dsetvol', sudo=True)
 
-  # The code needs to be put on instance first...
-  # ...also tensorflow-gpu should be pip installed (while inside virtualenv)
+  # TODO: The code needs to be put on instance first...
+  # TODO: ...also tensorflow-gpu should be pip installed (while inside virtualenv)
 
   # Run train command(s) on trainer instance
   for cmd in project.config.train:

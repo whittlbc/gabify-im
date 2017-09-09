@@ -30,7 +30,6 @@ class CreateProject(Resource):
     return '', 200
 
 
-# TODO: Create an actual TRAINER_AMI_ID and replace that value in definitions.py
 @namespace.route('/train')
 class TrainProject(Resource):
   """Start training model for project"""
