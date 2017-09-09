@@ -11,6 +11,7 @@ from src.ec2 import ec2
 
 
 def perform(project):
+  # Get the trainer instance for this project
   instance = dbi.find_one(Instance, {'project': project, 'role': roles.TRAINER})
 
   if instance:
