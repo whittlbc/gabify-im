@@ -46,6 +46,9 @@ def perform(project):
   remote_exec(instance.ip, 'init_vol', sudo=True)
   remote_exec(instance.ip, 'mount_dsetvol', sudo=True)
 
+  # The code needs to be put on instance first...
+  # ...also tensorflow-gpu should be pip installed (while inside virtualenv)
+
   # Run train command(s) on trainer instance
   for cmd in project.config.train:
     remote_exec(instance.ip, cmd)
