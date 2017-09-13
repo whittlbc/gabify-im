@@ -9,6 +9,7 @@ from src.helpers.definitions import tmp_dir, GAB_FILE, API_AMI_ID, VOLUME_DEVICE
 from src.services import config_from_file, create_volume, create_instance, watch_instance_until_running, init_attached_volume
 from src.helpers.utils import get_file_size, gb2gib
 from src.helpers import roles
+from src.ssh import remote_exec
 
 
 # TODO: Run this whole thing as a transaction
@@ -64,6 +65,9 @@ def perform(repo):
   # Detach the volume
   aws_instance.detach_volume(
     Device=VOLUME_DEVICE,
-    VolumeId=volume.aws_volume_id,
-    Force=False
+    VolumeId=volume.aws_volume_id
   )
+
+  remote_exec(instance.ip, 'git clone {} project'.format(repo))
+  # TODO: git clone project's code onto instance
+  # TODO: git clone API-wrapper code onto instance and move it into a folder inside the project called <project.uid>

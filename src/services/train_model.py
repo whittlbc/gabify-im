@@ -28,14 +28,17 @@ def perform(project):
     # Update the IP
     instance = dbi.update(instance, {'ip': aws_instance.public_ip_address})
 
-  logger.info('Attaching volume to trainer instance...')
+  # Attach volume to trainer instance (if not already attached)
+  attached_vol_ids = [v.id for v in aws_instance.volumes.all()]
+  project_vol_id = project.volume.aws_volume_id
 
-  # TODO: Not sure what error we'll run into if the volume is already attached...check for this
-  # Attach volume to trainer instance
-  aws_instance.attach_volume(
-    Device=VOLUME_DEVICE,
-    VolumeId=project.volume.aws_volume_id
-  )
+  if project_vol_id not in attached_vol_ids:
+    logger.info('Attaching volume to trainer instance...')
+
+    aws_instance.attach_volume(
+      Device=VOLUME_DEVICE,
+      VolumeId=project_vol_id
+    )
 
   out, err = remote_exec(instance.ip, 'ls -l /usr/local/bin | grep init_vol')
 
@@ -43,12 +46,11 @@ def perform(project):
   if not out:
     remote_exec(instance.ip, 'init_attached_vol', sudo=True)
 
-  # TODO: Might run into error with this one if it's already been run...might need to check if /dsetvol exists
-  remote_exec(instance.ip, 'init_vol', sudo=True)
-  remote_exec(instance.ip, 'mount_dsetvol', sudo=True)
+  remote_exec(instance.ip, 'init_vol', sudo=True)  # Requires a (y|n) confirmation if already run
+  remote_exec(instance.ip, 'mount_dsetvol', sudo=True)  # Fails if /dsetvol already exists
 
-  # TODO: The code needs to be put on instance first...
-  # TODO: ...also tensorflow-gpu should be pip installed (while inside virtualenv)
+  # TODO: git clone the code onto the instance
+  # TODO: pip install tensorflow-gpu on instance while inside virtual env
 
   # Run train command(s) on trainer instance
   for cmd in project.config.train:
