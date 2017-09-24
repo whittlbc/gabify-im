@@ -12,6 +12,8 @@ def perform(from_instance, to_instance):
 
   logger.info('Transferring model from {} to {}'.format(source, dest))
 
+  # TODO: Don't think this will work...will need to do 2 separate transfers
+  # with a cache dir in this project as location #2
   os.system('scp {} {}'.format(source, dest))
 
 

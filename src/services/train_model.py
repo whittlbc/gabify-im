@@ -46,11 +46,24 @@ def perform(project):
   if not out:
     remote_exec(instance.ip, 'init_attached_vol', sudo=True)
 
-  remote_exec(instance.ip, 'init_vol', sudo=True)  # Requires a (y|n) confirmation if already run
-  remote_exec(instance.ip, 'mount_dsetvol', sudo=True)  # Fails if /dsetvol already exists
+  # Run the rest of the volume initialization scripts
+  remote_exec(instance.ip, 'yes Yes | sudo init_vol')
+  remote_exec(instance.ip, 'mount_dsetvol', sudo=True)
 
-  # TODO: git clone the code onto the instance
-  # TODO: pip install tensorflow-gpu on instance while inside virtual env
+  out, err = remote_exec(instance.ip, 'ls -l | grep {}'.format(project.uid))
+
+  # Clone the project onto the instance if not already there
+  if not out:
+    remote_exec(instance.ip, 'git clone {}.git {}'.format(project.repo, project.uid))
+
+    # Add the files to the project that you need:
+    # api.py and watcher.py
+
+    # Add/update config vars for project (however you plan to go about doing this)
+
+    # Remove tensorflow or tensorflow-gpu from requirements.txt if there
+
+    remote_exec(instance.ip, 'cd {} && source venv/bin/activate && pip install -r requirements.txt && pip install tensorflow-gpu'.format(project.uid))
 
   # Run train command(s) on trainer instance
   for cmd in project.config.train:
